@@ -8,6 +8,7 @@ namespace KaufAuto.Models
 {
     public abstract class Auto
     {
+        //properties
         public int Id { get; set; } 
         public string Marke { get; set; }
         public string Modell { get; set; }
@@ -17,7 +18,7 @@ namespace KaufAuto.Models
         public string Zustand {  get; set; }
         public int Kilometerstand { get; set; }
         public int Türenanzahl {  get; set; }
-        public string Fahrzeugtyb {  get; set; }
+        public string Fahrzeugtyp {  get; set; }
 
         public abstract void Info();
     }

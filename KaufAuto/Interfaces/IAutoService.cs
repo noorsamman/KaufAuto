@@ -9,7 +9,7 @@ namespace KaufAuto.Interfaces
 {
     public interface IAutoService
     {
-        void Hinzufuegen(Auto auto);
+        void Hinzufuegen();
         bool Loeschen(int id);
         void Bearbeiten(int id, Auto neueDaten);
         List<Auto> AlleAutos();

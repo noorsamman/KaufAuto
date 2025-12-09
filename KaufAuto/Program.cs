@@ -9,7 +9,7 @@ using KaufAuto.Models;
 namespace KaufAuto
 {
     internal class Program
-    {
+    {      // Hauptmethode
         static void Main(string[] args)
         {
             AutoManager manager = new AutoManager();
@@ -26,7 +26,7 @@ namespace KaufAuto
 
             }
 
-            //Loop
+            //Loop für das Menü
             bool running = true;
 
             while (running) 
@@ -42,44 +42,52 @@ namespace KaufAuto
                 Console.WriteLine("6 - Auswertungen anzeigen");
                 Console.WriteLine("7 - Autos speichern");
                 Console.WriteLine("8 - Autos laden");
+                Console.WriteLine("9 - Autos nach Preis sortieren");
+                Console.WriteLine("10 - Autos nach Baujahr sortieren");
+                Console.WriteLine("11 - Autos nach PS sortieren");
                 Console.WriteLine("0 - Programm beenden");
                 Console.WriteLine("===============================");
                 Console.Write("Auswahl eingeben: ");
 
+                // Benutzereingabe lesen
                 string auswahl = Console.ReadLine();
                 Console.Clear();
 
+                // Menüauswahl verarbeiten
+
                 switch (auswahl) 
                 {
-                        case "1":
+                    // Verschiedene Fälle für jede Menüoption
+                    //Hinzufügen
+                    case "1":
                         manager.Hinzufuegen();
                         break;
-
-                        case "2":
+                    //Löschen
+                    case "2":
                         Console.Write("ID eingeben zum Löschen: ");
                         int idLoeschen;
                         if (int.TryParse(Console.ReadLine(), out idLoeschen ))
                             manager.Loeschen(idLoeschen);
                         break;
-
-                        case "3":
+                    //Bearbeiten
+                    case "3":
                         Console.Write("ID eingeben zum Bearbeiten: ");
                         int idBearbeiten;
                         if (int.TryParse(Console.ReadLine(), out idBearbeiten))
                             manager.Bearbeiten(idBearbeiten, null);
                         break;
-
-                        case "4":
+                    //Alle anzeigen
+                    case "4":
                         manager.AlleAutos();
                         break;
-
-                        case "5":
+                    //Suche nach Marke
+                    case "5":
                             Console.Write("Marke eingeben zum Suchen: ");
                             string marke = Console.ReadLine();
                              manager.SucheNachMarke(marke);
                              break;
-
-                        case "6":
+                    //Auswertungen
+                    case "6":
 
 
                             var adaten = manager.ErstelleAuswertungen();
@@ -87,36 +95,59 @@ namespace KaufAuto
                         Console.WriteLine($"Gesamtanzahl Autos: {adaten.gesamt}");
                         Console.WriteLine($"Anzahl Neuwagen: {adaten.neu}");
                         Console.WriteLine($"Anzahl Gebrauchtwagen: {adaten.gebraucht}");
-                        Console.WriteLine($"Durchschnittliche Kilometer PKW: {adaten.kmPkw:F2}");
-                        Console.WriteLine($"Durchschnittliche Kilometer Transporter: {adaten.kmTransporter:F2}");
+                        Console.WriteLine($"Summe Kilometer PKW: {adaten.kmPkw:F2}");
+                        Console.WriteLine($"Summe Kilometer Transporter: {adaten.kmTransporter:F2}");
                         break;
-
-                        case "7":
+                    //Speichern
+                    case "7":
 
                         speicher.Speichern(manager.AlleAutos());
 
                         break;
 
-
-                        case "8":
+                    //Laden
+                    case "8":
 
                         geladeneAutos = speicher.Laden();
                         manager.SetAutos(geladeneAutos);
-                        Console.WriteLine("Autos wurden aus der JSON-Datei neu geladen.");
+                        Console.WriteLine($"{geladeneAutos.Count} Autos wurden neu geladen.");
+
                         break;
 
-                        case "0":
+
+                    // Sortieroptionen
+
+                    //Nach Preis
+                    case "9":
+                            manager.SortNachPreis();
+                        Console.WriteLine("Autos nach Preis sortiert.");
+                        break;
+                    //Nach Baujahr
+                    case "10":
+                            manager.SortNachBaujahr();
+                            Console.WriteLine("Autos nach Baujahr sortiert.");
+                        break;
+                    //Nach PS
+                    case "11":
+                            manager.SortNachPS();
+                            Console.WriteLine("Autos nach PS sortiert.");
+                        break;
+
+                    //Beenden
+                    case "0":
 
                         running = false;
                         break;
+                    //ungültige Auswahl
 
-                        default:
+                    default:
 
                         Console.WriteLine("Ungültige Auswahl. Bitte erneut versuchen.");
                         break;
                 }
+                // Warten auf Benutzereingabe bevor das Menü neu angezeigt wird
 
-                 Console.WriteLine("\nWeiter mit Enter...");
+                Console.WriteLine("\nWeiter mit Enter...");
                  Console.ReadLine();
                 Console.Clear();
 

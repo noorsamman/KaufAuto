@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using KaufAuto.Models;
 using KaufAuto.Interfaces;
-using Newtonsoft.Json;
-using System.IO;
-
-
 
 
 namespace KaufAuto.Services
@@ -19,14 +15,70 @@ namespace KaufAuto.Services
         public void Speichern(List<Auto> autos)
         {
             string json = JsonConvert.SerializeObject(autos, Formatting.Indented);
-
             File.WriteAllText(dateiPfad, json);
 
             Console.WriteLine("Daten wurden erfolgreich gespeichert.");
         }
+
         public List<Auto> Laden()
         {
-            return new List<Auto>();
+            // Datei existiert nicht → leere Liste
+            if (!File.Exists(dateiPfad))
+                return new List<Auto>();
+
+            string json = File.ReadAllText(dateiPfad);
+
+            // Datei existiert aber leer
+            if (string.IsNullOrWhiteSpace(json))
+                return new List<Auto>();
+
+            JArray array;
+
+            try
+            {
+                array = JArray.Parse(json);
+            }
+            catch
+            {
+                Console.WriteLine("Fehler beim Lesen der JSON-Datei. Datei ist beschädigt.");
+                return new List<Auto>();
+            }
+
+            var liste = new List<Auto>();
+
+            // Jede JSON-Zeile ein Auto
+            foreach (var item in array)
+            {
+                string typ = item["Fahrzeugtyp"]?.ToString();
+                Auto auto = null;
+
+                switch (typ)
+                {
+                    case "PKW":
+                        auto = item.ToObject<PKW>();
+                        break;
+
+                    case "SUV":
+                        auto = item.ToObject<SUV>();
+                        break;
+
+                    case "Transporter":
+                        auto = item.ToObject<Transporter>();
+                        break;
+
+                    default:
+                        Console.WriteLine("Unbekannter Fahrzeugtyp in JSON gefunden.");
+                        break;
+                }
+
+                if (auto != null)
+                    liste.Add(auto);
+            }
+
+            return liste;
         }
+
+
+
     }
 }

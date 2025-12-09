@@ -3,6 +3,7 @@ using KaufAuto.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,6 +13,33 @@ namespace KaufAuto.Services
     {
         private List<Auto> autos = new List<Auto>();
         private int naechsteId = 1;
+
+        private Auto FindeAutoById(int id)
+        {
+        foreach (var auto in autos)
+            {
+                if (auto.Id == id)
+                {
+                    return auto;
+                }
+            }
+
+            return null;
+        }
+        public void SetAutos(List<Auto> liste)
+        {
+            if (liste == null)
+
+                    autos = new List<Auto>();
+            else
+                autos = liste;
+
+            if (autos.Count > 0)
+            {
+                naechsteId = autos.Max(a => a.Id) + 1;
+            }
+
+        }
 
         public void Hinzufuegen()
         {
@@ -204,33 +232,151 @@ namespace KaufAuto.Services
 
             autos.Remove(gefundenesAuto);
 
+
             Console.WriteLine("Auto erfolgreich gelöscht.");
             Console.WriteLine("-------------------------------------");
 
             return true;
         }
-
         public void Bearbeiten(int id, Auto neueDaten)
         {
-           
+            Auto auto = FindeAutoById(id);
+            if (auto == null)
+            {
+                Console.WriteLine("Kein Auto mit dieser ID gefunden.");
+                return;
+            }
+
+            // Marke bearbeiten
+            Console.WriteLine($"Aktuelle Marke: {auto.Marke}");
+            Console.Write("Neue Marke eingeben (Enter = keine Änderung): ");
+            string neueMarke = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(neueMarke))
+            {
+                auto.Marke = neueMarke;
+            }
+
+            // Modell bearbeiten
+            Console.WriteLine($"Aktuelles Modell: {auto.Modell}");
+            Console.Write("Neues Modell eingeben (Enter = keine Änderung): ");
+            string neuesModell = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(neuesModell))
+            {
+                auto.Modell = neuesModell;
+            }
+
+            // Preis bearbeiten
+            Console.WriteLine($"Aktueller Preis: {auto.Preis}");
+            Console.Write("Neuen Preis eingeben (Enter = keine Änderung): ");
+            string preisEingabe = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(preisEingabe))
+            {
+                double neuerPreis;
+                while (!double.TryParse(preisEingabe, out neuerPreis) || neuerPreis <= 0)
+                {
+                    Console.WriteLine("Ungültige Eingabe! Preis muss eine Zahl und größer als 0 sein.");
+                    Console.Write("Bitte Preis erneut eingeben: ");
+                    preisEingabe = Console.ReadLine();
+                }
+                auto.Preis = neuerPreis;
+            }
+
+            // Kilometer bearbeiten
+            Console.WriteLine($"Aktueller Kilometerstand: {auto.Kilometerstand}");
+            Console.Write("Neuen Kilometerstand eingeben (Enter = keine Änderung): ");
+            string kmEingabe = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(kmEingabe))
+            {
+                int neuerKm;
+                while (!int.TryParse(kmEingabe, out neuerKm) || neuerKm < 0)
+                {
+                    Console.WriteLine("Ungültige Eingabe! Kilometerstand muss eine Zahl und >= 0 sein.");
+                    Console.Write("Bitte Kilometer erneut eingeben: ");
+                    kmEingabe = Console.ReadLine();
+                }
+                auto.Kilometerstand = neuerKm;
+            }
+
+            Console.WriteLine("Das Auto wurde erfolgreich aktualisiert.");
+            Console.WriteLine("----------------------------------------");
         }
 
         public List<Auto> AlleAutos()
         {
-           
-            return new List<Auto>();
+            if (autos.Count == 0)
+            {
+                Console.WriteLine("Keine Autos im System vorhanden.");
+                return new List<Auto>();
+            }
+
+            Console.WriteLine("Aktueller Fahrzeugbestand:");
+            Console.WriteLine("-------------------------------------");
+
+            foreach (var a in autos)
+            {
+                Console.WriteLine(
+                    $"ID {a.Id} – {a.Marke} {a.Modell} – {a.Fahrzeugtyp} – {a.MotorleistungPS} PS – {a.Getriebe} – {a.Zustand} – {a.Kilometerstand} km – {a.Türenanzahl} Türen"
+                );
+            }
+
+            Console.WriteLine("-------------------------------------");
+
+            return autos;
         }
+
 
         public List<Auto> SucheNachMarke(string marke)
         {
-            
-            return new List<Auto>();
+            // Wenn Eingabe leer → keine Suche
+
+            if (string.IsNullOrWhiteSpace(marke))
+            {
+                Console.WriteLine("Keine gültige Marke eingegeben.");
+                return new List<Auto>();
+            }
+
+            // Marke in lowercase für insensitive Suche
+
+            string suchbegriff = marke.ToLower();
+
+            // Autos suchen, die Marke enthalten
+
+            var gefundene = autos
+                .Where(a => a.Marke != null && a.Marke.ToLower().Contains(suchbegriff))
+                .ToList();
+
+            if (gefundene.Count == 0)
+            {
+                Console.WriteLine("Keine Autos gefunden für diese Marke.");
+                return new List<Auto>();
+            }
+
+            Console.WriteLine("Gefundene Autos:");
+            Console.WriteLine("--------------------------------");
+
+            foreach (var auto in gefundene)
+            {
+                Console.WriteLine($"ID {auto.Id} – {auto.Marke} {auto.Modell}");
+            }
+
+            Console.WriteLine("--------------------------------");
+
+            return gefundene;
         }
+
 
         public (int gesamt, int neu, int gebraucht, double kmPkw, double kmTransporter) ErstelleAuswertungen()
         {
-            
-            return (0, 0, 0, 0, 0);
+            int gesamt = autos.Count;
+            int neu = autos.Count(a => a.Zustand == "Neu");
+            int gebraucht = autos.Count(a => a.Zustand == "Gebraucht");
+
+            double kmPkw = autos.Where(a => a is PKW).Sum(a => a.Kilometerstand);
+            double kmTransporter = autos.Where(a => a is Transporter).Sum(a => a.Kilometerstand);
+
+
+            return (gesamt, neu, gebraucht, kmPkw, kmTransporter);
+
         }
 
         private int GeneriereId()

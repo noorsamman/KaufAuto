@@ -11,7 +11,7 @@ namespace KaufAuto.Models
     {
         public override void Info()
         {
-            
+
         }
 
     }

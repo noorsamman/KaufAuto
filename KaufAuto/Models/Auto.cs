@@ -18,6 +18,7 @@ namespace KaufAuto.Models
         public string Zustand {  get; set; }
         public int Kilometerstand { get; set; }
         public int Türenanzahl {  get; set; }
+        public int Baujahr { get; set; }
         public string Fahrzeugtyp {  get; set; }
 
         public abstract void Info();

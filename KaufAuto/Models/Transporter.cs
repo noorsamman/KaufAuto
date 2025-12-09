@@ -12,7 +12,11 @@ namespace KaufAuto.Models
     {
         public override void Info()
         {
-            
+            Console.WriteLine(
+                $"[Transporter] ID {Id} – {Marke} {Modell}, {MotorleistungPS} PS, {Getriebe}, Zustand: {Zustand}, " +
+                $"{Kilometerstand} km, {Türenanzahl} Türen, Baujahr {Baujahr}"
+            );
+
         }
     }
 }

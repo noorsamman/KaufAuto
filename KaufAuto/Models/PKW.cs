@@ -11,6 +11,10 @@ namespace KaufAuto.Models
     {
         public override void Info()
         {
+            Console.WriteLine(
+                $"[PKW] ID {Id} – {Marke} {Modell}, {MotorleistungPS} PS, {Getriebe}, Zustand: {Zustand}, " +
+                $"{Kilometerstand} km, {Türenanzahl} Türen, Baujahr {Baujahr}"
+            );
 
         }
     }

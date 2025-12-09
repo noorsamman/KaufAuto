@@ -100,6 +100,9 @@ namespace KaufAuto.Services
             }
             neuesAuto.MotorleistungPS = ps;
 
+
+
+
             // Getriebe auswählen: 1 = Automatik, 2 = Schaltgetriebe
 
             Console.WriteLine("Getriebe auswählen: 1 = Automatik, 2 = Schaltgetriebe");
@@ -128,6 +131,19 @@ namespace KaufAuto.Services
                 Console.WriteLine("Preis erneut eingeben:");
             }
             neuesAuto.Preis = preis;
+
+            // Baujahr eingeben
+            int baujahr;
+            Console.WriteLine("Baujahr eingeben (z. B. 2015):");
+
+            while (!int.TryParse(Console.ReadLine(), out baujahr)
+                   || baujahr < 1900
+                   || baujahr > DateTime.Now.Year)
+            {
+                Console.WriteLine("Ungültiges Baujahr! Bitte korrektes Jahr eingeben:");
+            }
+
+            neuesAuto.Baujahr = baujahr;
 
             // Zustand auswählen: Neu oder Gebraucht
 
@@ -187,65 +203,43 @@ namespace KaufAuto.Services
             Console.WriteLine("-------------------------------------");
 
         }
-
         public bool Loeschen(int id)
         {
-            Auto gefundenesAuto = null;
-
-            // Auto in der Liste suchen 
-
-            foreach (var a in autos)
-            {
-                if (a.Id == id)
-                {
-                    gefundenesAuto = a;
-                    break;
-                }
-            }
-            // Wenn nichts gefunden → false zurück
+            Auto gefundenesAuto = autos.FirstOrDefault(a => a.Id == id);
 
             if (gefundenesAuto == null)
             {
-                Console.WriteLine("Keine Auto mit dieser ID gefunden.");
+                Console.WriteLine("Kein Auto mit dieser ID gefunden.");
                 return false;
             }
-            string[] details = new string[]
-            {
-                "ID : " + gefundenesAuto.Id,
-                "Typ : " + gefundenesAuto.Fahrzeugtyp,
-                "Marke : " + gefundenesAuto.Marke,
-                "Modell : " + gefundenesAuto.Modell,
-                "(PS) : " + gefundenesAuto.MotorleistungPS,
-                "Getriebe : " + gefundenesAuto.Getriebe,
-                "Preis : " + gefundenesAuto.Preis,
-                "Zustand : " + gefundenesAuto.Zustand,
-                "Kilometerstand : " + gefundenesAuto.Kilometerstand,
-                "Türen : " + gefundenesAuto.Türenanzahl
-            };
+
             Console.WriteLine("Auto gefunden:");
-            foreach (var detail in details)
-            {
-                Console.WriteLine(detail);
-            }
+            gefundenesAuto.Info();
             Console.WriteLine("--------------------------------------");
 
-
             autos.Remove(gefundenesAuto);
-
 
             Console.WriteLine("Auto erfolgreich gelöscht.");
             Console.WriteLine("-------------------------------------");
 
             return true;
         }
+
+
+        
         public void Bearbeiten(int id, Auto neueDaten)
         {
             Auto auto = FindeAutoById(id);
+
             if (auto == null)
             {
                 Console.WriteLine("Kein Auto mit dieser ID gefunden.");
                 return;
             }
+            Console.WriteLine("Auto gefunden:");
+            auto.Info();
+            Console.WriteLine("----------------------------------------");
+            
 
             // Marke bearbeiten
             Console.WriteLine($"Aktuelle Marke: {auto.Marke}");
@@ -255,6 +249,25 @@ namespace KaufAuto.Services
             {
                 auto.Marke = neueMarke;
             }
+
+            // Baujahr bearbeiten
+            Console.WriteLine($"Aktuelles Baujahr: {auto.Baujahr}");
+            Console.Write("Neues Baujahr eingeben (Enter = keine Änderung): ");
+            string baujahrEingabe = Console.ReadLine();
+
+            if (!string.IsNullOrWhiteSpace(baujahrEingabe))
+            {
+                int neuesBaujahr;
+                while (!int.TryParse(baujahrEingabe, out neuesBaujahr)
+                       || neuesBaujahr < 1900
+                       || neuesBaujahr > DateTime.Now.Year)
+                {
+                    Console.WriteLine("Ungültige Eingabe! Bitte korrektes Jahr eingeben:");
+                    baujahrEingabe = Console.ReadLine();
+                }
+                auto.Baujahr = neuesBaujahr;
+            }
+
 
             // Modell bearbeiten
             Console.WriteLine($"Aktuelles Modell: {auto.Modell}");
@@ -297,9 +310,13 @@ namespace KaufAuto.Services
                 auto.Kilometerstand = neuerKm;
             }
 
-            Console.WriteLine("Das Auto wurde erfolgreich aktualisiert.");
-            Console.WriteLine("----------------------------------------");
+            Console.WriteLine("Neue Fahrzeugdaten:");
+            auto.Info();
+            Console.WriteLine("--------------------------------");
+
         }
+
+
 
         public List<Auto> AlleAutos()
         {
@@ -314,9 +331,7 @@ namespace KaufAuto.Services
 
             foreach (var a in autos)
             {
-                Console.WriteLine(
-                    $"ID {a.Id} – {a.Marke} {a.Modell} – {a.Fahrzeugtyp} – {a.MotorleistungPS} PS – {a.Getriebe} – {a.Zustand} – {a.Kilometerstand} km – {a.Türenanzahl} Türen"
-                );
+                a.Info();
             }
 
             Console.WriteLine("-------------------------------------");
@@ -356,7 +371,7 @@ namespace KaufAuto.Services
 
             foreach (var auto in gefundene)
             {
-                Console.WriteLine($"ID {auto.Id} – {auto.Marke} {auto.Modell}");
+                auto.Info();
             }
 
             Console.WriteLine("--------------------------------");
